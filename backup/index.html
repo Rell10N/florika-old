@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Флорика - Спасение Мэйлии</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="icon" type="image/png" href="assets/flori/flori_hello.png">
+</head>
+<body>
+
+  <div class="studio-intro" id="studio-intro">
+    <div class="studio-glow"></div>
+    <img src="assets/samples/studio_icon.png" alt="R&amp;G Studio" class="studio-icon" onerror="this.style.display='none'; document.getElementById('studio-fallback').style.display='block';">
+    <div class="studio-fallback" id="studio-fallback">R&amp;G Studio</div>
+    <div class="studio-progress"><span></span></div>
+  </div>
+
+  <div class="fade-overlay" id="fade-overlay"></div>
+
+  <div class="toast" id="toast"></div>
+
+  <div class="modal-backdrop" id="modal-settings" onclick="App.closeModal('modal-settings')">
+    <div class="modal-card modal-scroll" onclick="event.stopPropagation()">
+      <h2 class="modal-title">НАСТРОЙКИ</h2>
+      <div class="modal-row">
+        <span class="modal-label">Звук и музыка</span>
+        <button class="btn-toggle" id="btn-sound-toggle" onclick="App.toggleSound()">ВКЛ</button>
+      </div>
+      <button class="btn-secondary-3d" onclick="App.replayPrologue()">ПОСМОТРЕТЬ ПРОЛОГ СНОВА</button>
+      <div class="dev-code-row" id="dev-code-row">
+        <input type="text" id="dev-code-input" placeholder="Код разработчика" autocomplete="off" autocapitalize="off" spellcheck="false">
+        <button class="btn-toggle" onclick="App.applyDevCode()">ОК</button>
+      </div>
+      <div class="dev-panel is-hidden" id="dev-panel">
+        <div class="modal-row">
+          <span class="modal-label">Демо-режим</span>
+          <button class="btn-toggle is-off" id="btn-demo-toggle" onclick="App.toggleDemo()">ВЫКЛ</button>
+        </div>
+        <div class="demo-slider">
+          <input type="range" id="demo-range" min="0" max="100" step="1" value="0">
+          <span id="demo-value">0%</span>
+        </div>
+        <p class="modal-note">С 85% открывается сдача данных. Реальный прогресс игрока не меняется.</p>
+      </div>
+      <button class="btn-danger-3d" id="btn-reset-progress" onclick="App.resetProgress()">СБРОСИТЬ ПРОГРЕСС</button>
+      <button class="btn-primary-3d" onclick="App.closeModal('modal-settings')">ГОТОВО</button>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="modal-exit" onclick="App.closeModal('modal-exit')">
+    <div class="modal-card" onclick="event.stopPropagation()">
+      <h2 class="modal-title">ВЫЙТИ ИЗ ИГРЫ?</h2>
+      <p class="modal-text">Мэйлия и Флори будут ждать тебя в лаборатории.</p>
+      <button class="btn-primary-3d" onclick="App.closeModal('modal-exit')">ОСТАТЬСЯ</button>
+      <button class="btn-danger-3d" onclick="App.confirmExit()">ВЫЙТИ</button>
+    </div>
+  </div>
+
+  <div class="fusion" id="fusion">
+    <div class="fusion-stage">
+      <div class="fusion-flask fusion-left" id="fusion-left"></div>
+      <div class="fusion-flask fusion-right" id="fusion-right"></div>
+      <div class="fusion-orb" id="fusion-orb"></div>
+      <span class="fusion-spark sp1"></span>
+      <span class="fusion-spark sp2"></span>
+      <span class="fusion-spark sp3"></span>
+      <span class="fusion-spark sp4"></span>
+    </div>
+    <div class="fusion-caption">Мэйлия смешивает идеи...</div>
+  </div>
+
+  <div class="modal-backdrop modal-feedback" id="modal-feedback">
+    <div class="feedback-card">
+      <div class="feedback-flori">
+        <img src="assets/flori/flori_talk.png" alt="Флори" id="feedback-img">
+      </div>
+      <div class="feedback-body">
+        <span class="speaker-name">Флори</span>
+        <p class="feedback-text" id="feedback-text"></p>
+        <div class="feedback-tags" id="feedback-tags"></div>
+        <div class="feedback-buttons">
+          <button class="btn-blue-3d is-hidden" id="btn-fact" onclick="Lab.openFact()">ИНТЕРЕСНЫЙ ФАКТ</button>
+          <button class="btn-primary-3d" onclick="Lab.nextAfterFeedback()">ДАЛЬШЕ</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop modal-fact" id="modal-fact" onclick="Lab.closeFact()">
+    <div class="fact-card" onclick="event.stopPropagation()">
+      <div class="fact-preview" id="fact-preview">
+        <img id="fact-img" alt="" onerror="this.style.display='none'">
+      </div>
+      <div class="fact-body">
+        <h3 class="fact-title" id="fact-title"></h3>
+        <p class="fact-text" id="fact-text"></p>
+        <div class="fact-sources" id="fact-sources"></div>
+        <button class="btn-primary-3d" onclick="Lab.closeFact()">ПОНЯТНО</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="app-viewport">
+
+    <section class="screen active" id="screen-menu">
+
+      <button class="btn-gear only-compact" aria-label="Настройки" onclick="App.openSettings()">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58a.49.49 0 0 0 .12-.61l-1.92-3.32a.488.488 0 0 0-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54a.484.484 0 0 0-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58a.49.49 0 0 0-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
+      </button>
+
+      <div class="logo-zone">
+        <img src="assets/samples/logo_banner.png" alt="Флорика" class="main-logo-img" id="logo-img" onerror="this.style.display='none'; document.getElementById('logo-fallback').style.display='block';">
+        <div class="logo-fallback" id="logo-fallback">
+          <h1>ФЛОРИКА</h1>
+          <span>Спасение логики Мэйлии</span>
+        </div>
+      </div>
+
+      <div class="flori-stage">
+        <img src="assets/flori/flori_hello.png" alt="Флори приветствует" class="flori-hero-sprite">
+      </div>
+
+      <div class="hills-vacuum-track">
+        <img src="assets/samples/toy_vacuum.png" alt="Робот-пылесос" class="vacuum-sprite" id="vacuum-img" onerror="this.style.display='none';">
+      </div>
+
+      <div class="bushes-foreground-layer"></div>
+
+      <div class="menu-action-zone">
+        <button class="btn-primary-3d btn-play" id="btn-start-game" onclick="App.onPlay()">ИГРАТЬ</button>
+
+        <div class="menu-secondary-row">
+          <button class="btn-menu is-locked" id="btn-sandbox" onclick="App.showLocked()">
+            <svg class="icon-lock" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M17 9V7a5 5 0 0 0-10 0v2H5v12h14V9h-2zm-8-2a3 3 0 0 1 6 0v2H9V7z"/></svg>
+            <span>ПЕСОЧНИЦА</span>
+          </button>
+          <button class="btn-menu only-wide" id="btn-settings-wide" onclick="App.openSettings()">НАСТРОЙКИ</button>
+          <button class="btn-menu is-danger" id="btn-exit" onclick="App.openModal('modal-exit')">ВЫХОД</button>
+        </div>
+      </div>
+
+    </section>
+
+    <section class="screen" id="screen-tutorial" onclick="App.onScreenTap()">
+
+      <div class="tutorial-stage" id="tutorial-stage">
+        <img src="assets/flori/flori_panic.png" alt="Флори" class="tutorial-flori-sprite" id="tutorial-flori-img">
+      </div>
+
+      <div class="dialogue-box" id="dialogue-box">
+        <div class="dialogue-header">
+          <span class="speaker-name">Флори</span>
+          <div class="step-indicator" id="step-indicator"></div>
+        </div>
+
+        <p class="dialogue-text" id="dialogue-text"><span id="dialogue-typed"></span><span class="dialogue-pending" id="dialogue-pending"></span></p>
+
+        <div class="name-input-wrap">
+          <input type="text" id="player-name-input" placeholder="Введи своё имя..." maxlength="15" autocomplete="off" enterkeyhint="done">
+        </div>
+
+        <div class="dialogue-buttons">
+          <button id="btn-tutorial-prev" class="btn-secondary-3d" onclick="event.stopPropagation(); App.goBack()">В МЕНЮ</button>
+          <button id="btn-tutorial-next" class="btn-primary-3d btn-dialogue" onclick="event.stopPropagation(); App.advance()">ДАЛЬШЕ</button>
+        </div>
+      </div>
+
+    </section>
+
+    <section class="screen" id="screen-levels">
+
+      <div class="top-bar levels-top">
+        <img src="assets/samples/logo_banner.png" alt="Флорика" class="levels-logo" onerror="this.style.display='none'; document.getElementById('levels-logo-text').style.display='block';">
+        <span class="levels-logo-text" id="levels-logo-text">ФЛОРИКА</span>
+
+        <div class="mailia-bar">
+          <div class="mailia-track"><div class="mailia-fill"></div></div>
+          <span class="mailia-percent">0%</span>
+          <span class="demo-tag">ДЕМО</span>
+          <div class="mailia-avatar">
+            <img src="assets/samples/mailia_icon.png" alt="" onerror="this.style.display='none'">
+            <span>М</span>
+          </div>
+        </div>
+
+        <div class="stars-counter">
+          <svg class="star-icon earned" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          <span id="levels-stars">0 / 18</span>
+        </div>
+      </div>
+
+      <div class="levels-main">
+        <div class="levels-flori">
+          <img src="assets/flori/flori_guide.png" alt="Флори" class="levels-flori-img">
+        </div>
+
+        <div class="levels-panel">
+          <div class="levels-grid" id="levels-grid"></div>
+
+          <div class="levels-actions">
+            <button class="btn-back" onclick="App.backToMenu()">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+              <span>Назад</span>
+            </button>
+            <button class="btn-primary-3d btn-finale is-disabled" id="btn-finale" onclick="App.onFinale()">СДАТЬ ДАННЫЕ МЭЙЛИИ</button>
+          </div>
+        </div>
+
+        <div class="levels-spacer"></div>
+      </div>
+
+    </section>
+
+    <section class="screen" id="screen-lab">
+
+      <div class="top-bar lab-top">
+        <button class="btn-back" onclick="Lab.onBack()">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+          <span>Назад</span>
+        </button>
+
+        <div class="mailia-bar">
+          <div class="mailia-track"><div class="mailia-fill"></div></div>
+          <span class="mailia-percent">0%</span>
+          <span class="demo-tag">ДЕМО</span>
+          <div class="mailia-avatar">
+            <img src="assets/samples/mailia_icon.png" alt="" onerror="this.style.display='none'">
+            <span>М</span>
+          </div>
+        </div>
+
+        <div class="lab-stars">
+          <svg class="star-icon lab-star" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          <svg class="star-icon lab-star" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          <svg class="star-icon lab-star" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          <span class="lab-count" id="lab-count">0 / 28</span>
+        </div>
+      </div>
+
+      <div class="lab-body" id="lab-body" data-view="shelf">
+
+        <div class="lab-pane shelf-pane" id="pane-shelf">
+          <div class="shelf-area" id="shelf-area">
+            <svg class="link-layer" id="link-layer" aria-hidden="true"></svg>
+            <div class="flask-grid" id="flask-grid"></div>
+          </div>
+
+          <div class="hint-bubble" id="hint-bubble"></div>
+
+          <div class="shelf-actions">
+            <button class="btn-hint" id="btn-hint" onclick="Lab.toggleHint()">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M9 21c0 .55.45 1 1 1h4c.55 0 1-.45 1-1v-1H9v1zm3-19C8.14 2 5 5.14 5 9c0 2.38 1.19 4.47 3 5.74V17c0 .55.45 1 1 1h6c.55 0 1-.45 1-1v-2.26c1.81-1.27 3-3.36 3-5.74 0-3.86-3.14-7-7-7z"/></svg>
+              <span>Подсказка</span>
+            </button>
+            <button class="btn-primary-3d btn-create is-disabled" id="btn-create" onclick="Lab.createHypothesis()">СОЗДАТЬ ГИПОТЕЗУ</button>
+          </div>
+        </div>
+
+        <div class="lab-pane tablet-pane" id="pane-tablet">
+          <div class="tablet" id="tablet" data-state="idle">
+
+            <div class="tablet-idle">
+              <div class="idle-orb"></div>
+              <p>Выбери две колбы на полке и нажми «Создать гипотезу». Мэйлия предложит идею, а ты проверишь её.</p>
+            </div>
+
+            <div class="tablet-content">
+              <div class="tablet-chips">
+                <span class="chip">Гипотеза Мэйлии</span>
+                <span class="chip done is-hidden" id="chip-done">Уже проверено</span>
+              </div>
+
+              <div class="hyp-row">
+                <div class="hyp-icon" id="hyp-icon">
+                  <img id="hyp-img" alt="" onerror="this.style.display='none'">
+                </div>
+                <div class="hyp-info">
+                  <h3 id="hyp-title"></h3>
+                  <p id="hyp-text"></p>
+                </div>
+              </div>
+
+              <div class="verdict-row">
+                <button class="btn-verdict yes" id="btn-yes" onclick="Lab.chooseVerdict(true)">
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M9 16.17 4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                  <span>Возможно</span>
+                </button>
+                <button class="btn-verdict no" id="btn-no" onclick="Lab.chooseVerdict(false)">
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+                  <span>Невозможно</span>
+                </button>
+              </div>
+
+              <div class="explain" id="explain">
+                <div class="explain-inner">
+                  <div class="explain-title">Объяснение</div>
+                  <div class="options-grid" id="options-grid"></div>
+                  <button class="btn-primary-3d btn-check is-disabled" id="btn-check" onclick="Lab.checkAnswer()">ПРОВЕРИТЬ</button>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+
+    </section>
+
+    <section class="screen" id="screen-stub">
+
+      <div class="tutorial-stage">
+        <img src="assets/flori/flori_guide.png" alt="Флори" class="tutorial-flori-sprite" id="stub-flori-img">
+      </div>
+
+      <div class="dialogue-box">
+        <div class="dialogue-header">
+          <span class="speaker-name" id="stub-title"></span>
+        </div>
+        <p class="dialogue-text" id="stub-text"></p>
+        <div class="dialogue-buttons">
+          <button class="btn-primary-3d btn-dialogue" onclick="App.backToMenu()">В МЕНЮ</button>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <script src="js/data.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/lab.js"></script>
+</body>
+</html>

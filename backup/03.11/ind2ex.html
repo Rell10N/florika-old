@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Флорика - Спасение Мэйлии</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="icon" type="image/png" href="assets/flori/flori_hello.png">
+</head>
+<body>
+
+  <div class="fade-overlay" id="fade-overlay"></div>
+
+  <div class="app-viewport">
+
+    <section class="screen active" id="screen-menu">
+      
+      <div class="logo-zone">
+        <img src="assets/samples/logo_banner.png" alt="Флорика" class="main-logo-img" id="logo-img" onerror="this.style.display='none'; document.getElementById('logo-fallback').style.display='block';">
+        <div class="logo-fallback" id="logo-fallback">
+          <h1>ФЛОРИКА</h1>
+          <span>Спасение логики Мэйлии</span>
+        </div>
+      </div>
+
+      <div class="flori-stage">
+        <img src="assets/flori/flori_hello.png" alt="Флори приветствует" class="flori-hero-sprite">
+      </div>
+
+      <div class="hills-vacuum-track">
+        <img src="assets/samples/toy_vacuum.png" alt="Робот-пылесос" class="vacuum-sprite" id="vacuum-img" onerror="this.style.display='none';">
+      </div>
+
+      <div class="bushes-foreground-layer"></div>
+
+      <div class="menu-action-zone">
+        <div class="input-card">
+          <label for="player-name-input">ИМЯ ИССЛЕДОВАТЕЛЯ:</label>
+          <input type="text" id="player-name-input" placeholder="Введи своё имя..." maxlength="15" autocomplete="off">
+        </div>
+
+        <button class="btn-primary-3d" id="btn-start-game" onclick="App.goToTutorial()">
+          НАЧАТЬ ИССЛЕДОВАНИЕ
+        </button>
+      </div>
+
+    </section>
+
+    <section class="screen" id="screen-tutorial" onclick="App.handleDialogueClick()">
+      
+      <div class="tutorial-stage">
+        <img src="assets/flori/flori_glitch.png" alt="Флори" class="tutorial-flori-sprite" id="tutorial-flori-img">
+      </div>
+
+      <div class="dialogue-box">
+        <div class="dialogue-header">
+          <span class="speaker-name">Флори</span>
+          <div class="step-indicator">
+            <span class="step-dot active" id="dot-0"></span>
+            <span class="step-dot" id="dot-1"></span>
+            <span class="step-dot" id="dot-2"></span>
+            <span class="step-dot" id="dot-3"></span>
+          </div>
+        </div>
+
+        <p class="dialogue-text" id="dialogue-text"></p>
+
+        <div class="dialogue-buttons">
+        <button id="btn-tutorial-prev" class="btn-secondary-3d" onclick="event.stopPropagation(); App.handleDialoguePrev(event)">В МЕНЮ</button>
+        <button id="btn-tutorial-next" class="btn-primary-3d btn-dialogue" onclick="event.stopPropagation(); App.handleDialogueClick(event)">ДАЛЬШЕ</button>
+      </div>
+
+    </section>
+
+  </div>
+
+  <script src="js/data.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

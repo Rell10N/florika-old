@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Флорика - Спасение Мэйлии</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="icon" type="image/png" href="assets/flori/flori_hello.png">
+</head>
+<body>
+
+  <div class="studio-intro" id="studio-intro">
+    <div class="studio-plate">
+      <img src="assets/samples/studio_icon.png" alt="" class="studio-icon" onerror="this.style.display='none';">
+      <span class="studio-name">R<span class="studio-amp">&amp;</span>G Studio</span>
+    </div>
+  </div>
+
+  <div class="fade-overlay" id="fade-overlay"></div>
+
+  <div class="toast" id="toast"></div>
+
+  <div class="modal-backdrop" id="modal-settings" onclick="App.closeModal('modal-settings')">
+    <div class="modal-card" onclick="event.stopPropagation()">
+      <h2 class="modal-title">НАСТРОЙКИ</h2>
+      <div class="modal-row">
+        <span class="modal-label">Звук и музыка</span>
+        <button class="btn-toggle" id="btn-sound-toggle" onclick="App.toggleSound()">ВКЛ</button>
+      </div>
+      <button class="btn-secondary-3d" id="btn-reset-progress" onclick="App.resetProgress()">СБРОСИТЬ ПРОГРЕСС</button>
+      <button class="btn-primary-3d" onclick="App.closeModal('modal-settings')">ГОТОВО</button>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="modal-exit" onclick="App.closeModal('modal-exit')">
+    <div class="modal-card" onclick="event.stopPropagation()">
+      <h2 class="modal-title">ВЫЙТИ ИЗ ИГРЫ?</h2>
+      <p class="modal-text">Мэйлия и Флори будут ждать тебя в лаборатории.</p>
+      <button class="btn-primary-3d" onclick="App.closeModal('modal-exit')">ОСТАТЬСЯ</button>
+      <button class="btn-secondary-3d" onclick="App.confirmExit()">ВЫЙТИ</button>
+    </div>
+  </div>
+
+  <div class="app-viewport">
+
+    <section class="screen active" id="screen-menu">
+
+      <button class="btn-gear only-compact" aria-label="Настройки" onclick="App.openModal('modal-settings')">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58a.49.49 0 0 0 .12-.61l-1.92-3.32a.488.488 0 0 0-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54a.484.484 0 0 0-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58a.49.49 0 0 0-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
+      </button>
+
+      <div class="logo-zone">
+        <img src="assets/samples/logo_banner.png" alt="Флорика" class="main-logo-img" id="logo-img" onerror="this.style.display='none'; document.getElementById('logo-fallback').style.display='block';">
+        <div class="logo-fallback" id="logo-fallback">
+          <h1>ФЛОРИКА</h1>
+          <span>Спасение логики Мэйлии</span>
+        </div>
+      </div>
+
+      <div class="flori-stage">
+        <img src="assets/flori/flori_hello.png" alt="Флори приветствует" class="flori-hero-sprite">
+      </div>
+
+      <div class="hills-vacuum-track">
+        <img src="assets/samples/toy_vacuum.png" alt="Робот-пылесос" class="vacuum-sprite" id="vacuum-img" onerror="this.style.display='none';">
+      </div>
+
+      <div class="bushes-foreground-layer"></div>
+
+      <div class="menu-action-zone">
+        <button class="btn-primary-3d btn-play" id="btn-start-game" onclick="App.onPlay()">ИГРАТЬ</button>
+
+        <div class="menu-secondary-row">
+          <button class="btn-menu is-locked" id="btn-sandbox" onclick="App.showLocked()">
+            <svg class="icon-lock" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M17 9V7a5 5 0 0 0-10 0v2H5v12h14V9h-2zm-8-2a3 3 0 0 1 6 0v2H9V7z"/></svg>
+            <span>ПЕСОЧНИЦА</span>
+          </button>
+          <button class="btn-menu only-wide" id="btn-settings-wide" onclick="App.openModal('modal-settings')">НАСТРОЙКИ</button>
+          <button class="btn-menu" id="btn-exit" onclick="App.openModal('modal-exit')">ВЫХОД</button>
+        </div>
+      </div>
+
+    </section>
+
+    <section class="screen" id="screen-tutorial" onclick="App.onScreenTap()">
+
+      <div class="tutorial-stage" id="tutorial-stage">
+        <img src="assets/flori/flori_panic.png" alt="Флори" class="tutorial-flori-sprite" id="tutorial-flori-img">
+      </div>
+
+      <div class="dialogue-box" id="dialogue-box">
+        <div class="dialogue-header">
+          <span class="speaker-name">Флори</span>
+          <div class="step-indicator" id="step-indicator"></div>
+        </div>
+
+        <p class="dialogue-text" id="dialogue-text"><span id="dialogue-typed"></span><span class="dialogue-pending" id="dialogue-pending"></span></p>
+
+        <div class="name-input-wrap">
+          <input type="text" id="player-name-input" placeholder="Введи своё имя..." maxlength="15" autocomplete="off" enterkeyhint="done">
+        </div>
+
+        <div class="dialogue-buttons">
+          <button id="btn-tutorial-prev" class="btn-secondary-3d" onclick="event.stopPropagation(); App.goBack()">В МЕНЮ</button>
+          <button id="btn-tutorial-next" class="btn-primary-3d btn-dialogue" onclick="event.stopPropagation(); App.advance()">ДАЛЬШЕ</button>
+        </div>
+      </div>
+
+    </section>
+
+    <section class="screen" id="screen-stub">
+
+      <div class="tutorial-stage">
+        <img src="assets/flori/flori_guide.png" alt="Флори" class="tutorial-flori-sprite" id="stub-flori-img">
+      </div>
+
+      <div class="dialogue-box">
+        <div class="dialogue-header">
+          <span class="speaker-name" id="stub-title"></span>
+        </div>
+        <p class="dialogue-text" id="stub-text"></p>
+        <div class="dialogue-buttons">
+          <button class="btn-primary-3d btn-dialogue" onclick="App.backToMenu()">В МЕНЮ</button>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <script src="js/data.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
